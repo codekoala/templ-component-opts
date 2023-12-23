@@ -1,0 +1,9 @@
+package sample
+
+templ Sample(opts *Opts) {
+    <div>
+        <div>Name: { opts.Name }</div>
+        <div>Age: { opts.AgeStr() }</div>
+        <div>Happy: { opts.HappyStr() }</div>
+    </div>
+}

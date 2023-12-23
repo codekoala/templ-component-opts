@@ -1,0 +1,20 @@
+package view
+
+import "github.com/codekoala/templ-component-opts/example/view/component/sample"
+
+templ Index() {
+    <html>
+        <body>
+            @sample.Sample(sample.With(
+                sample.Name("Alice"),
+                sample.Age(45),
+            ))
+
+            @sample.Sample(sample.With(
+                sample.Name("Bob"),
+                sample.Age(47),
+                sample.Happy(false),
+            ))
+        </body>
+    </html>
+}

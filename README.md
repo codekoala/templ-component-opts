@@ -1,2 +1,3 @@
 # templ-component-opts
-Generate code for #templ component option structs.
+
+This project is designed to help generate code to simplify passing options to a templ component.
