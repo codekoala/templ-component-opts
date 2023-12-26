@@ -47,10 +47,10 @@ func MustParse(value string) time.Time {
 
 ## Installation
 
-You can install `templ-component-opts` using the `go get` command:
+You can install `templ-component-opts` using the `go install` command:
 
 ```sh
-$ go get -u github.com/codekoala/templ-component-opts
+$ go install github.com/codekoala/templ-component-opts@latest
 ```
 
 This will download and install the executable in your `$GOPATH/bin` directory.
@@ -145,6 +145,10 @@ func (o *Opts) DisplayStr() string {
 ```
 
 In the interest of keeping things as simple as possible, package level functions are created to populate fields in the annotated struct. For some data types, such as `int64`, `float64`, and `bool`, additional methods are generated on the struct to return a stringified version of the field.
+
+## `go generate`
+
+Add a single `//go:generate templ-component-opts .` in your project, and `go generate` should automatically produce the `_tcogen.go` files for any struct with the `//templ:component-opts` directive.
 
 ## License
 

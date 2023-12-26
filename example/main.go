@@ -1,3 +1,4 @@
+//go:generate templ-component-opts .
 package main
 
 import (

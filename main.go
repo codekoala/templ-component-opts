@@ -118,6 +118,7 @@ func genFuncs(path string, fset *token.FileSet, file *ast.File, structName strin
 
 	// Create a new file to hold the generated functions
 	newPath := strings.Replace(path, ".go", CodegenSuffix, 1)
+	fmt.Printf("Found %s.%s; generating %s...\n", file.Name.Name, structName, newPath)
 	out, err := os.Create(newPath)
 	if err != nil {
 		fmt.Println(err)
