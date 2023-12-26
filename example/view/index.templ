@@ -1,19 +1,30 @@
 package view
 
-import "github.com/codekoala/templ-component-opts/example/view/component/sample"
+import "github.com/codekoala/templ-component-opts/example/view/component/book"
+import "time"
+
+func MustParse(value string) time.Time {
+    val, err := time.Parse("January 2, 2006", value)
+    if  err != nil {
+        panic(err)
+    } 
+    return val
+}
 
 templ Index() {
     <html>
         <body>
-            @sample.Sample(sample.With(
-                sample.Name("Alice"),
-                sample.Age(45),
+            @book.Book(book.With(
+                book.Title("1984"),
+                book.Author("George Orwell"),
+                book.Published(MustParse("June 8, 1949")),
             ))
 
-            @sample.Sample(sample.With(
-                sample.Name("Bob"),
-                sample.Age(47),
-                sample.Happy(false),
+            @book.Book(book.With(
+                book.Display(false),
+                book.Title("Dune"),
+                book.Author("Frank Herbert"),
+                book.Published(MustParse("August 1, 1965")),
             ))
         </body>
     </html>

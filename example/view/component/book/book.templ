@@ -1,0 +1,11 @@
+package book
+
+templ Book(opts *Opts) {
+    if opts.Display {
+        <div>
+            <div>Title: { opts.Title }</div>
+            <div>Author: { opts.Author }</div>
+            <div>Published: { opts.Published.String() }</div>
+        </div>
+    }
+}

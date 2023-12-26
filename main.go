@@ -140,18 +140,23 @@ func genFuncs(path string, fset *token.FileSet, file *ast.File, structName strin
 		},
 		Package: 2,
 		Name:    ast.NewIdent(file.Name.Name),
-		Decls: []ast.Decl{
-			&ast.GenDecl{
-				Tok: token.IMPORT,
-				Specs: []ast.Spec{&ast.ImportSpec{
-					Path: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: "\"strconv\"",
-					},
-				}},
-			},
-		},
 	}
+
+	// include all imports from the source file
+	imports := &ast.GenDecl{
+		TokPos: newFile.Package,
+		Tok:    token.IMPORT,
+		Specs:  make([]ast.Spec, 0),
+	}
+	imports.Specs = append(imports.Specs, &ast.ImportSpec{
+		Path: &ast.BasicLit{Value: `"strconv"`},
+	})
+	for _, srcImport := range file.Imports {
+		imports.Specs = append(imports.Specs, &ast.ImportSpec{
+			Path: &ast.BasicLit{Value: srcImport.Path.Value},
+		})
+	}
+	newFile.Decls = append(newFile.Decls, imports)
 
 	structNameIdent := ast.NewIdent(structName)
 	genPrelude(fset, newFile, structNameIdent, fields)
