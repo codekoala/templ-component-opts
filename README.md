@@ -1,6 +1,6 @@
 # Templ Component Opts
 
-This project is designed to help generate code to simplify passing options to a templ component.
+This project is designed to help generate code to simplify passing options to a [templ component](https://github.com/a-h/templ).
 
 Rather than creating templ components that take multiple parameters, they can instead take a single parameters that includes the various bits of context that are important for the component.
 
