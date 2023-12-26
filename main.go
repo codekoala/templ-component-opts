@@ -200,6 +200,78 @@ func genPrelude(fset *token.FileSet, file *ast.File, structName *ast.Ident, fiel
 		Specs: []ast.Spec{optType},
 	})
 
+	genDefaultFunc(fset, file, structName, fields)
+
+	// // generate a new function to build a struct with a series of options
+	// withDecl := &ast.FuncDecl{
+	// 	Name: ast.NewIdent("With"),
+	// 	Type: &ast.FuncType{
+	// 		Params: &ast.FieldList{
+	// 			List: []*ast.Field{
+	// 				{
+	// 					// take one or more Opts
+	// 					Names: []*ast.Ident{ast.NewIdent("opts")},
+	// 					Type: &ast.Ellipsis{
+	// 						Elt: optTypeName,
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	//
+	// 		Results: &ast.FieldList{
+	// 			List: []*ast.Field{
+	// 				{
+	// 					// return a pointer to the struct
+	// 					Type: &ast.StarExpr{
+	// 						X: structName,
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 	},
+	// 	Body: &ast.BlockStmt{
+	// 		List: []ast.Stmt{
+	// 			&ast.AssignStmt{
+	// 				Lhs: []ast.Expr{ast.NewIdent("out")},
+	// 				Tok: token.DEFINE,
+	// 				Rhs: []ast.Expr{
+	// 					&ast.UnaryExpr{
+	// 						Op: token.AND,
+	// 						X: &ast.CompositeLit{
+	// 							Type: structName,
+	// 							Elts: fieldDefaults,
+	// 						},
+	// 					},
+	// 				},
+	// 			},
+	// 			&ast.ExprStmt{
+	// 				// Create the call expression node
+	// 				X: &ast.CallExpr{
+	// 					Fun: &ast.SelectorExpr{
+	// 						X:   ast.NewIdent("out"),
+	// 						Sel: ast.NewIdent("With"),
+	// 					},
+	// 					Args: []ast.Expr{
+	// 						ast.NewIdent("opts"),
+	// 					},
+	// 					Ellipsis: 1,
+	// 				},
+	// 			},
+	// 			&ast.ReturnStmt{
+	// 				Results: []ast.Expr{ast.NewIdent("out")},
+	// 			},
+	// 		},
+	// 	},
+	// }
+	//
+	// file.Decls = append(file.Decls, withDecl)
+
+	genWithFunc(fset, file, structName)
+	genWithMethod(fset, file, structName)
+}
+
+// genDefaultFunc generates a function that returns a new struct with default values.
+func genDefaultFunc(fset *token.FileSet, file *ast.File, structName *ast.Ident, fields []*ast.Field) {
 	// find the value for fields with a "default" tag
 	var fieldDefaults []ast.Expr
 	for _, field := range fields {
@@ -234,6 +306,51 @@ func genPrelude(fset *token.FileSet, file *ast.File, structName *ast.Ident, fiel
 		})
 	}
 
+	decl := &ast.FuncDecl{
+		// define the function name
+		Name: ast.NewIdent("DefaultOpts"),
+
+		// define the method signature
+		Type: &ast.FuncType{
+			// return a pointer to the same struct
+			Results: &ast.FieldList{
+				List: []*ast.Field{
+					{
+						// return a pointer to the struct
+						Type: &ast.StarExpr{
+							X: structName,
+						},
+					},
+				},
+			},
+		},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{
+				&ast.AssignStmt{
+					Lhs: []ast.Expr{ast.NewIdent("out")},
+					Tok: token.DEFINE,
+					Rhs: []ast.Expr{
+						&ast.UnaryExpr{
+							Op: token.AND,
+							X: &ast.CompositeLit{
+								Type: structName,
+								Elts: fieldDefaults,
+							},
+						},
+					},
+				},
+				&ast.ReturnStmt{
+					Results: []ast.Expr{ast.NewIdent("out")},
+				},
+			},
+		},
+	}
+
+	file.Decls = append(file.Decls, decl)
+}
+
+// genWithFunc generates a function that is used to apply options to the struct defaults.
+func genWithFunc(fset *token.FileSet, file *ast.File, structName *ast.Ident) {
 	// generate a new function to build a struct with a series of options
 	withDecl := &ast.FuncDecl{
 		Name: ast.NewIdent("With"),
@@ -267,12 +384,8 @@ func genPrelude(fset *token.FileSet, file *ast.File, structName *ast.Ident, fiel
 					Lhs: []ast.Expr{ast.NewIdent("out")},
 					Tok: token.DEFINE,
 					Rhs: []ast.Expr{
-						&ast.UnaryExpr{
-							Op: token.AND,
-							X: &ast.CompositeLit{
-								Type: structName,
-								Elts: fieldDefaults,
-							},
+						&ast.CallExpr{
+							Fun: ast.NewIdent("DefaultOpts"),
 						},
 					},
 				},
@@ -297,8 +410,6 @@ func genPrelude(fset *token.FileSet, file *ast.File, structName *ast.Ident, fiel
 	}
 
 	file.Decls = append(file.Decls, withDecl)
-
-	genWithMethod(fset, file, structName)
 }
 
 // genWithMethod generates a method on the target struct that is used to apply options to the struct.

@@ -6,8 +6,12 @@ import "strconv"
 
 type Opt func(*Opts)
 
-func With(opts ...Opt) *Opts {
+func DefaultOpts() *Opts {
 	out := &Opts{Happy: true}
+	return out
+}
+func With(opts ...Opt) *Opts {
+	out := DefaultOpts()
 	out.With(opts...)
 	return out
 }

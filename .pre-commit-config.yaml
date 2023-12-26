@@ -9,8 +9,6 @@ repos:
       language: system
       files: '\.go$'
       pass_filenames: false
-- repo: local
-  hooks:
     # generate templ components
     - id: templ
       name: templ
