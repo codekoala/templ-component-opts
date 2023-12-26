@@ -1,15 +1,10 @@
 package view
 
-import "github.com/codekoala/templ-component-opts/example/view/component/book"
-import "time"
+import (
+    "time"
 
-func MustParse(value string) time.Time {
-    val, err := time.Parse("January 2, 2006", value)
-    if  err != nil {
-        panic(err)
-    } 
-    return val
-}
+    "github.com/codekoala/templ-component-opts/example/view/component/book"
+)
 
 templ Index() {
     <html>
@@ -28,4 +23,13 @@ templ Index() {
             ))
         </body>
     </html>
+}
+
+// MustParse parses a date or panics.
+func MustParse(value string) time.Time {
+    val, err := time.Parse("January 2, 2006", value)
+    if  err != nil {
+        panic(err)
+    }
+    return val
 }
