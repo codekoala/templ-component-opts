@@ -176,7 +176,6 @@ func genFuncs(path string, fset *token.FileSet, file *ast.File, structName strin
 }
 
 func genPrelude(fset *token.FileSet, file *ast.File, structName *ast.Ident, fields []*ast.Field) {
-
 	// define a new Opt type that is simply a function which takes a pointer to the struct
 	optType := &ast.TypeSpec{
 		Name: optTypeName,
@@ -201,71 +200,6 @@ func genPrelude(fset *token.FileSet, file *ast.File, structName *ast.Ident, fiel
 	})
 
 	genDefaultFunc(fset, file, structName, fields)
-
-	// // generate a new function to build a struct with a series of options
-	// withDecl := &ast.FuncDecl{
-	// 	Name: ast.NewIdent("With"),
-	// 	Type: &ast.FuncType{
-	// 		Params: &ast.FieldList{
-	// 			List: []*ast.Field{
-	// 				{
-	// 					// take one or more Opts
-	// 					Names: []*ast.Ident{ast.NewIdent("opts")},
-	// 					Type: &ast.Ellipsis{
-	// 						Elt: optTypeName,
-	// 					},
-	// 				},
-	// 			},
-	// 		},
-	//
-	// 		Results: &ast.FieldList{
-	// 			List: []*ast.Field{
-	// 				{
-	// 					// return a pointer to the struct
-	// 					Type: &ast.StarExpr{
-	// 						X: structName,
-	// 					},
-	// 				},
-	// 			},
-	// 		},
-	// 	},
-	// 	Body: &ast.BlockStmt{
-	// 		List: []ast.Stmt{
-	// 			&ast.AssignStmt{
-	// 				Lhs: []ast.Expr{ast.NewIdent("out")},
-	// 				Tok: token.DEFINE,
-	// 				Rhs: []ast.Expr{
-	// 					&ast.UnaryExpr{
-	// 						Op: token.AND,
-	// 						X: &ast.CompositeLit{
-	// 							Type: structName,
-	// 							Elts: fieldDefaults,
-	// 						},
-	// 					},
-	// 				},
-	// 			},
-	// 			&ast.ExprStmt{
-	// 				// Create the call expression node
-	// 				X: &ast.CallExpr{
-	// 					Fun: &ast.SelectorExpr{
-	// 						X:   ast.NewIdent("out"),
-	// 						Sel: ast.NewIdent("With"),
-	// 					},
-	// 					Args: []ast.Expr{
-	// 						ast.NewIdent("opts"),
-	// 					},
-	// 					Ellipsis: 1,
-	// 				},
-	// 			},
-	// 			&ast.ReturnStmt{
-	// 				Results: []ast.Expr{ast.NewIdent("out")},
-	// 			},
-	// 		},
-	// 	},
-	// }
-	//
-	// file.Decls = append(file.Decls, withDecl)
-
 	genWithFunc(fset, file, structName)
 	genWithMethod(fset, file, structName)
 }
@@ -580,6 +514,7 @@ func genFunc(fset *token.FileSet, file *ast.File, structName *ast.Ident, fieldNa
 	}
 }
 
+// genStrFunc generates a helper method to return the value of a specific field as a string
 func genStrFunc(fset *token.FileSet, file *ast.File, structName *ast.Ident, fieldName string, fieldType ast.Expr, fieldTypeIdent *ast.Ident) {
 	selfIdent := ast.NewIdent("o")
 	fieldIdent := ast.NewIdent(fieldName)
